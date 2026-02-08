@@ -1,15 +1,34 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link"; // Improved: Use Next.js Link
+import Link from "next/link";
+import { useRouter } from "next/navigation"; // To redirect after login
+import { supabase } from "@/lib/supabase"; // Our bridge from the previous step
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Logging in...", email);
+    setLoading(true);
+    setErrorMsg(null);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setErrorMsg(error.message);
+      setLoading(false);
+    } else {
+      // Success! Send the user to the dashboard
+      router.push("/admin/dashboard");
+    }
   };
 
   return (
@@ -22,10 +41,13 @@ export default function AdminLogin() {
           <h2 className="fw-bold" style={{ color: "#0B2D72" }}>
             Admin Access
           </h2>
-          <p className="text-muted small">
-            Enter your credentials to manage testimonials.
-          </p>
         </div>
+
+        {errorMsg && (
+          <div className="alert alert-danger py-2 small" role="alert">
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleLogin}>
           <div className="mb-3">
@@ -61,15 +83,15 @@ export default function AdminLogin() {
           </div>
           <button
             type="submit"
+            disabled={loading}
             className="btn w-100 fw-bold py-2"
             style={{ backgroundColor: "#0B2D72", color: "#F6E7BC" }}
           >
-            Sign In
+            {loading ? "Authenticating..." : "Sign In"}
           </button>
         </form>
 
         <div className="text-center mt-4">
-          {/* Improved: Using Link instead of <a> */}
           <Link href="/" className="text-decoration-none small text-muted">
             &larr; Back to Website
           </Link>
