@@ -11,6 +11,7 @@ body {
   color: var(--evella-navy);
   font-family: 'Inter', sans-serif;
   margin: 0;
+  padding-top: 80px;
 }
 
 /* Modern Gradient Text with full compatibility */
@@ -154,4 +155,26 @@ body {
   /* Solid color for the dropdown menu itself */
   color: white;
   padding: 10px;
+}
+
+/* Fix for Sticky Navbar hiding section titles */
+section {
+  scroll-margin-top: 100px;
+  /* Adjust this to match your navbar height */
+}
+
+/* Ensure smooth scrolling globally */
+html {
+  scroll-behavior: smooth;
+}
+
+.navbar-sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: rgba(253, 248, 236, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(11, 45, 114, 0.05);
 }
