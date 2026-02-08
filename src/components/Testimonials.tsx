@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 
-// Define the shape of our testimonial data
 interface Testimonial {
   id: number;
   name: string;
@@ -15,64 +14,149 @@ interface Testimonial {
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Track button visibility
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
       const { data, error } = await supabase
         .from("testimonials")
         .select("*")
-        .order("created_at", { ascending: false }); // Show newest first
+        .order("created_at", { ascending: false });
 
-      if (!error && data) {
-        setTestimonials(data);
-      }
+      if (!error && data) setTestimonials(data);
       setLoading(false);
     };
-
     fetchTestimonials();
   }, []);
 
-  if (loading) return null; // Or a subtle spinner
-  if (testimonials.length === 0) return null; // Hide section if no reviews yet
+  // Function to check scroll position and update button state
+  const checkScrollLimits = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 10); // True if scrolled more than 10px
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10); // True if not at the very end
+    }
+  };
+
+  useEffect(() => {
+    const currentRef = scrollRef.current;
+    if (currentRef) {
+      currentRef.addEventListener("scroll", checkScrollLimits);
+      // Check limits initially after data loads
+      checkScrollLimits();
+    }
+    return () => currentRef?.removeEventListener("scroll", checkScrollLimits);
+  }, [testimonials]);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const { scrollLeft } = scrollRef.current;
+      const scrollAmount = 450;
+      const scrollTo =
+        direction === "left"
+          ? scrollLeft - scrollAmount
+          : scrollLeft + scrollAmount;
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
+
+  if (loading || testimonials.length === 0) return null;
 
   return (
-    <section id="testimonials" className="py-5 bg-light">
-      <div className="container">
+    <section
+      id="testimonials"
+      className="testimonial-section position-relative overflow-hidden"
+    >
+      <div className="container testimonial-container-relative">
         <div className="text-center mb-5">
-          <h2 className="display-6 fw-bold" style={{ color: "#0B2D72" }}>
-            Real Success Stories
+          <h2 className="display-5 fw-bold testimonial-title">
+            What Clients Say
           </h2>
+          <div className="title-underline mb-3"></div>
           <p className="text-muted">
-            Verified feedback from professionals who bypassed the bots.
+            Proven results from professionals around the globe.
           </p>
         </div>
-        <div className="row g-4">
+        {/* Navigation Buttons */}
+        <div className="d-none d-md-block">
+          {canScrollLeft && (
+            <button
+              onClick={() => scroll("left")}
+              className="btn shadow-sm rounded-circle position-absolute top-50 translate-middle-y nav-btn btn-prev"
+              aria-label="Previous"
+            >
+              {/* Simple Line Arrow Left */}
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          )}
+
+          {canScrollRight && (
+            <button
+              onClick={() => scroll("right")}
+              className="btn shadow-sm rounded-circle position-absolute top-50 translate-middle-y nav-btn btn-next"
+              aria-label="Next"
+            >
+              {/* Simple Line Arrow Right */}
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        <div
+          ref={scrollRef}
+          className="testimonial-scroll-container no-scrollbar d-flex"
+        >
           {testimonials.map((rev) => (
-            <div key={rev.id} className="col-md-4">
-              <div className="card h-100 border-0 shadow-sm p-4">
+            <div key={rev.id} className="testimonial-card-wrapper">
+              <div className="card h-100 border-0 shadow-sm p-4 position-relative overflow-hidden">
+                <span className="position-absolute end-0 top-0 p-3 opacity-10 fw-bold quote-icon">
+                  &rdquo;
+                </span>
                 <div className="d-flex align-items-center mb-3">
-                  <div
-                    className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
-                    style={{
-                      width: "40px",
-                      height: "40px",
-                      backgroundColor: "#0992C2",
-                    }}
-                  >
-                    {rev.name[0]}
+                  <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm testimonial-avatar">
+                    {rev.name ? rev.name[0] : "C"}
                   </div>
                   <div className="ms-3">
                     <h6 className="mb-0 fw-bold">{rev.name}</h6>
-                    <small className="text-muted small">{rev.role}</small>
+                    <small className="text-muted small d-block">
+                      {rev.role}
+                    </small>
                   </div>
                 </div>
-                <p className="small fst-italic text-muted">
+                <p className="small text-secondary mb-4 testimonial-content">
                   &ldquo;{rev.content}&rdquo;
                 </p>
                 {rev.is_verified && (
-                  <div className="mt-auto pt-3 border-top">
-                    <span className="badge bg-success-subtle text-success border border-success-subtle small">
-                      ✓ Verified Fiverr Client
+                  <div className="mt-auto">
+                    <span className="badge rounded-pill bg-success-subtle text-success px-3 py-2 border border-success-subtle verified-badge">
+                      <i className="bi bi-patch-check-fill me-1"></i> Verified
+                      Fiverr Client
                     </span>
                   </div>
                 )}

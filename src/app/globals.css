@@ -217,3 +217,167 @@ html {
   /* Matches your card background */
   transition: background-color 5000s ease-in-out 0s;
 }
+
+
+.testimonial-section {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  background-color: #f8f9fa;
+  /* Removed overflow-hidden here */
+}
+
+.testimonial-title {
+  color: #0B2D72;
+}
+
+.title-underline {
+  height: 4px;
+  width: 60px;
+  background-color: #0992C2;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.testimonial-scroll-container {
+  display: flex;
+  flex-wrap: nowrap;
+  /* Force single line */
+  overflow-x: auto;
+  gap: 1.5rem;
+  padding: 1rem 0 2rem 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.testimonial-scroll-area {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.testimonial-card-wrapper {
+  flex: 0 0 auto;
+  /* CRITICAL: Prevents cards from shrinking or wrapping */
+  width: 320px;
+  /* Fixed width for each card */
+  scroll-snap-align: start;
+}
+
+.testimonial-avatar {
+  width: 45px;
+  height: 45px;
+  background-color: #0B2D72;
+}
+
+.testimonial-section .btn-light {
+  border: 1px solid #eee;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.testimonial-section .btn-light:hover {
+  background-color: #0B2D72;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Container for the buttons to live in */
+.testimonial-container-relative {
+  position: relative;
+  padding: 0 15px;
+}
+
+/* Base button styling */
+.nav-btn {
+  width: 50px;
+  height: 50px;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  color: #0B2D72;
+  z-index: 100;
+  /* Higher z-index */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.nav-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.nav-btn:hover {
+  background-color: #0B2D72 !important;
+  color: #ffffff !important;
+  /* Re-apply the centering transform plus the scale */
+  transform: translateY(-50%) scale(1.1) !important;
+  box-shadow: 0 4px 15px rgba(11, 45, 114, 0.2);
+}
+
+/* Positioning the buttons */
+.btn-prev {
+  left: 0;
+  /* Pulls it slightly outside the container for a modern look */
+}
+
+.btn-next {
+  right: 0;
+}
+
+.btn-prev:hover svg {
+  transform: translateX(-2px);
+}
+
+.btn-next:hover svg {
+  transform: translateX(2px);
+}
+
+/* Ensure the icons inside are centered */
+.nav-btn i {
+  font-size: 1.2rem;
+}
+
+.quote-icon {
+  color: #0B2D72;
+  line-height: 0.5;
+  font-size: 5rem;
+}
+
+.testimonial-content {
+  line-height: 1.6;
+}
+
+.verified-badge {
+  font-size: 0.7rem;
+}
+
+.admin-list-item {
+  transition: background-color 0.2s;
+}
+
+.admin-list-item:hover {
+  background-color: #f8f9fa;
+}
+
+.btn-delete {
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.btn-delete:hover {
+  background-color: #dc3545;
+  color: white;
+}
