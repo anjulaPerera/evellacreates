@@ -3,16 +3,35 @@
 import React, { useState } from "react";
 
 export default function ContactForm() {
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<
+    "IDLE" | "SENDING" | "SUCCESS" | "ERROR"
+  >("IDLE");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus("sending");
+    setStatus("SENDING");
 
-    // Simulate an API call
-    setTimeout(() => {
-      setStatus("success");
-    }, 1500);
+    const form = e.currentTarget;
+    const data = new FormData(form);
+
+    try {
+      const response = await fetch("https://formspree.io/f/xwvnkzgo", {
+        method: "POST",
+        body: data,
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        setStatus("SUCCESS");
+        form.reset();
+      } else {
+        setStatus("ERROR");
+      }
+    } catch (error) {
+      setStatus("ERROR");
+    }
   };
 
   return (
@@ -20,15 +39,15 @@ export default function ContactForm() {
       <div className="row justify-content-center">
         <div className="col-lg-7">
           <div className="contact-glass-card">
-            {status === "success" ? (
+            {status === "SUCCESS" ? (
               <div className="text-center py-5">
-                <h2 className="text-white fw-bold">Message Sent!</h2>
+                <h2 className="text-white fw-bold">Success!</h2>
                 <p className="text-white-50">
-                  I&apos;ll get back to you within 24 hours. Let&apos;s get you
-                  hired.
+                  Your request has been sent. I&apos;ll reach out within 24
+                  hours.
                 </p>
                 <button
-                  onClick={() => setStatus("")}
+                  onClick={() => setStatus("IDLE")}
                   className="btn btn-outline-light rounded-pill px-4 mt-3"
                 >
                   Send another
@@ -42,14 +61,80 @@ export default function ContactForm() {
                 </p>
 
                 <form onSubmit={handleSubmit}>
-                  {/* ... same input fields as before ... */}
+                  <div className="row">
+                    <div className="col-md-6 mb-4">
+                      <label
+                        htmlFor="email"
+                        className="text-white-50 small fw-bold mb-2 text-uppercase tracking-wider"
+                      >
+                        Email Address
+                      </label>
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        className="form-control form-control-lg form-input-custom"
+                        placeholder="email@example.com"
+                        required
+                      />
+                    </div>
+                    <div className="col-md-6 mb-4">
+                      <label
+                        htmlFor="service"
+                        className="text-white-50 small fw-bold mb-2 text-uppercase tracking-wider"
+                      >
+                        Service Needed
+                      </label>
+                      <div className="custom-select-wrapper">
+                        <select
+                          id="service"
+                          name="service"
+                          className="form-select form-control-lg form-select-custom"
+                          required
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
+                            Choose goal...
+                          </option>
+                          <optgroup label="Bundles">
+                            <option value="Full Suite">
+                              Full Suite (All 3)
+                            </option>
+                            <option value="Res+LI">Resume + LinkedIn</option>
+                          </optgroup>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <label
+                      htmlFor="message"
+                      className="text-white-50 small fw-bold mb-2 text-uppercase tracking-wider"
+                    >
+                      Project Details
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      className="form-control form-input-custom"
+                      rows={4}
+                      placeholder="Industry, experience level, etc..."
+                    ></textarea>
+                  </div>
+
                   <button
                     type="submit"
                     className="btn btn-lg w-100 py-3 fw-bold btn-evella-secondary shadow-lg"
-                    disabled={status === "sending"}
+                    disabled={status === "SENDING"}
                   >
-                    {status === "sending" ? "Sending..." : "Submit Request"}
+                    {status === "SENDING" ? "Processing..." : "Submit Request"}
                   </button>
+                  {status === "ERROR" && (
+                    <p className="text-danger small mt-3 text-center">
+                      Something went wrong. Please try again.
+                    </p>
+                  )}
                 </form>
               </>
             )}
