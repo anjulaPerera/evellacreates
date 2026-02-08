@@ -6,18 +6,21 @@ import Services from "@/components/Services";
 import ContactForm from "@/components/ContactForm";
 import Testimonials from "@/components/Testimonials";
 import { supabase } from "@/lib/supabase";
-import { error } from "console";
 
 export default async function Home() {
   // Fetch data on the server
-  const { data: testimonials } = await supabase
+  const { data: testimonials, error } = await supabase
     .from("testimonials")
     .select("*")
     .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Supabase error:", error);
-    }
+   if (error) {
+     // Option A: Just the message (Cleanest)
+     console.error("Supabase error:", error.message);
+
+     // Option B: If you want to see everything safely
+    //  console.error("Supabase error:", JSON.stringify(error, null, 2));
+   }
   return (
     <>
       <main>
