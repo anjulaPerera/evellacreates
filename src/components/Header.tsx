@@ -8,7 +8,7 @@ export default function Header() {
         <Image
           src="/logo.png"
           alt="evellacreates logo"
-          width={180}
+          width={250}
           height={40}
           priority
         />

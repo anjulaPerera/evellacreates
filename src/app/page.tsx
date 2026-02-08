@@ -1,49 +1,40 @@
-import Link from "next/link";
-
 export default function Home() {
   return (
-    <div className="flex flex-col items-center">
-      {/* Hero Section */}
-      <section className="w-full bg-cream py-20 px-6 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-primary text-5xl md:text-6xl font-extrabold leading-tight">
-            Stop letting <span className="text-secondary">AI ghostwrite</span>{" "}
-            your career.
-          </h2>
-          <p className="mt-6 text-primary/80 text-xl max-w-2xl mx-auto">
-            I provide professional, human-crafted resumes and LinkedIn
-            optimizations designed to beat ATS systems and land you the
-            interview.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-            <Link
-              href="#contact"
-              className="bg-primary text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-secondary transition-all shadow-xl"
-            >
-              Get My Custom Quote
-            </Link>
-            <Link
-              href="#services"
-              className="bg-transparent border-2 border-primary text-primary px-8 py-4 rounded-lg font-bold text-lg hover:bg-primary hover:text-white transition-all"
-            >
-              View Services
-            </Link>
-          </div>
-        </div>
-      </section>
+    <main className="min-h-[90vh] flex flex-col items-center justify-center bg-cream px-4">
+      {/* Hero Content */}
+      <div className="max-w-5xl w-full text-center space-y-10 py-20">
+        <h2 className="text-primary text-6xl md:text-8xl font-black tracking-tighter leading-none">
+          Stop letting <br />
+          <span className="text-secondary italic">AI ghostwrite</span> <br />
+          your career.
+        </h2>
 
-      {/* Trust Bar (SEO focused) */}
-      <section className="py-8 bg-white w-full border-b flex justify-center space-x-12 opacity-60 grayscale">
-        <span className="font-bold text-primary italic underline">
-          100% Manual Writing
-        </span>
-        <span className="font-bold text-primary italic underline">
-          Result-Oriented Strategy
-        </span>
-        <span className="font-bold text-primary italic underline">
-          SEO Optimized Profile
-        </span>
-      </section>
-    </div>
+        <p className="text-primary/90 text-xl md:text-2xl max-w-2xl mx-auto font-medium leading-relaxed">
+          I provide professional, human-crafted resumes and LinkedIn
+          optimizations designed to beat ATS systems and land you the interview.
+        </p>
+
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6">
+          {/* Primary Action Button */}
+          <button className="bg-[#0B2D72] text-[#F6E7BC] px-10 py-4 rounded-full font-bold text-xl shadow-xl hover:bg-[#0992C2] transition-colors min-w-[240px]">
+            Get My Custom Quote
+          </button>
+
+          {/* Secondary Action Button */}
+          <button className="border-2 border-[#0B2D72] text-[#0B2D72] px-10 py-4 rounded-full font-bold text-xl hover:bg-[#0B2D72] hover:text-[#F6E7BC] transition-all min-w-[240px]">
+            View Services
+          </button>
+        </div>
+      </div>
+
+      {/* Trust Bar - Positioned at the bottom of the hero area */}
+      <div className="w-full max-w-6xl border-t border-primary/20 py-10 mt-10">
+        <div className="flex flex-wrap justify-center gap-10 md:gap-20 text-primary font-extrabold uppercase tracking-[0.2em] text-xs opacity-70">
+          <span>✓ 100% Manual Writing</span>
+          <span>✓ Result-Oriented Strategy</span>
+          <span>✓ SEO Optimized Profile</span>
+        </div>
+      </div>
+    </main>
   );
 }

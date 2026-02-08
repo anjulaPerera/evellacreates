@@ -2,9 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* This ensures your custom background works even if the class is slow to load */
 body {
   background-color: #F6E7BC;
   margin: 0;
   font-family: sans-serif;
+}
+
+h2 {
+  color: #0B2D72 !important;
 }
