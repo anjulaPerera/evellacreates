@@ -1,33 +1,44 @@
-import Image from "next/image";
+import React from "react";
 import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="bg-white border-b py-3 px-6 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-      <div className="flex items-center gap-2">
-        <Image
-          src="/logo.png"
-          alt="evellacreates logo"
-          width={250}
-          height={40}
-          priority
-        />
-      </div>
-
-      <nav className="hidden md:flex items-center space-x-8 text-primary font-semibold">
-        <Link href="#services" className="hover:text-secondary">
-          Services
-        </Link>
-        <Link href="#about" className="hover:text-secondary">
-          Why Human?
-        </Link>
+    <nav className="navbar navbar-expand-lg py-4">
+      <div className="container">
+        {/* LOGO AREA */}
         <Link
-          href="#contact"
-          className="bg-primary text-cream px-6 py-2 rounded-full hover:bg-secondary transition-all"
+          href="/"
+          className="navbar-brand fw-bold fs-3"
+          style={{ color: "#0B2D72", letterSpacing: "-1px" }}
         >
-          Get a Quote
+          evella<span style={{ color: "#0992C2" }}>creates</span>
         </Link>
-      </nav>
-    </header>
+
+        {/* NAVIGATION LINKS */}
+        <div className="d-flex gap-4 align-items-center">
+          <Link
+            href="#services"
+            className="nav-link fw-semibold text-uppercase small tracking-wider"
+            style={{ color: "#0B2D72" }}
+          >
+            Services
+          </Link>
+          <Link
+            href="#why-human"
+            className="nav-link fw-semibold text-uppercase small tracking-wider"
+            style={{ color: "#0B2D72" }}
+          >
+            Why Human?
+          </Link>
+          <Link
+            href="#contact"
+            className="btn btn-sm px-4 py-2 rounded-pill fw-bold"
+            style={{ backgroundColor: "#0B2D72", color: "#F6E7BC" }}
+          >
+            Contact
+          </Link>
+        </div>
+      </div>
+    </nav>
   );
 }
