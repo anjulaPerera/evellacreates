@@ -4,10 +4,20 @@ import WhyHuman from "@/components/WhyHuman";
 import Process from "@/components/Process"; // New
 import Services from "@/components/Services";
 import ContactForm from "@/components/ContactForm";
-import Footer from "@/components/Footer";
 import Testimonials from "@/components/Testimonials";
+import { supabase } from "@/lib/supabase";
+import { error } from "console";
 
-export default function Home() {
+export default async function Home() {
+  // Fetch data on the server
+  const { data: testimonials } = await supabase
+    .from("testimonials")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Supabase error:", error);
+    }
   return (
     <>
       <main>
@@ -15,7 +25,7 @@ export default function Home() {
         <WhyHuman />
         <Process />
         <Services />
-        <Testimonials/>
+        <Testimonials initialData={testimonials || []} />
         <ContactForm />
       </main>
       {/* <Footer /> */}

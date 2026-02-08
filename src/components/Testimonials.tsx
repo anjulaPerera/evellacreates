@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { supabase } from "@/lib/supabase";
+import React, { useState, useRef, useEffect } from "react";
 
 interface Testimonial {
   id: number;
@@ -11,34 +10,26 @@ interface Testimonial {
   is_verified: boolean;
 }
 
-export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loading, setLoading] = useState(true);
+interface TestimonialsProps {
+  initialData: Testimonial[];
+}
+
+export default function Testimonials({ initialData }: TestimonialsProps) {
+  // We use the data passed from the server
+  const [testimonials] = useState<Testimonial[]>(initialData);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Track button visibility
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      const { data, error } = await supabase
-        .from("testimonials")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!error && data) setTestimonials(data);
-      setLoading(false);
-    };
-    fetchTestimonials();
-  }, []);
+  const [canScrollRight, setCanScrollRight] = useState(initialData.length > 1);
 
   // Function to check scroll position and update button state
   const checkScrollLimits = () => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setCanScrollLeft(scrollLeft > 10); // True if scrolled more than 10px
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10); // True if not at the very end
+      // Use a small 5px buffer for better reliability
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
     }
   };
 
@@ -46,7 +37,7 @@ export default function Testimonials() {
     const currentRef = scrollRef.current;
     if (currentRef) {
       currentRef.addEventListener("scroll", checkScrollLimits);
-      // Check limits initially after data loads
+      // Run once on mount to set initial button states
       checkScrollLimits();
     }
     return () => currentRef?.removeEventListener("scroll", checkScrollLimits);
@@ -64,7 +55,8 @@ export default function Testimonials() {
     }
   };
 
-  if (loading || testimonials.length === 0) return null;
+  // If no testimonials exist, don't show the section at all
+  if (testimonials.length === 0) return null;
 
   return (
     <section
@@ -81,6 +73,7 @@ export default function Testimonials() {
             Proven results from professionals around the globe.
           </p>
         </div>
+
         {/* Navigation Buttons */}
         <div className="d-none d-md-block">
           {canScrollLeft && (
@@ -89,7 +82,6 @@ export default function Testimonials() {
               className="btn shadow-sm rounded-circle position-absolute top-50 translate-middle-y nav-btn btn-prev"
               aria-label="Previous"
             >
-              {/* Simple Line Arrow Left */}
               <svg
                 width="20"
                 height="20"
@@ -111,7 +103,6 @@ export default function Testimonials() {
               className="btn shadow-sm rounded-circle position-absolute top-50 translate-middle-y nav-btn btn-next"
               aria-label="Next"
             >
-              {/* Simple Line Arrow Right */}
               <svg
                 width="20"
                 height="20"
