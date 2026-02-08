@@ -1,13 +1,92 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-body {
-  background-color: #F6E7BC;
-  margin: 0;
-  font-family: sans-serif;
+/* Custom Design Tokens */
+:root {
+  --evella-cream: #FDF8EC;
+  --evella-navy: #0B2D72;
+  --evella-blue: #0992C2;
+  --evella-glass: rgba(255, 255, 255, 0.1);
 }
 
-h2 {
-  color: #0B2D72 !important;
+body {
+  background-color: var(--evella-cream);
+  color: var(--evella-navy);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+}
+
+/* Modern Gradient Text with full compatibility */
+.hero-gradient-text {
+  background: linear-gradient(90deg, var(--evella-navy), var(--evella-blue));
+  -webkit-background-clip: text;
+  /* Vendor prefix for older engines */
+  background-clip: text;
+  /* Standard property */
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  /* Fallback */
+}
+
+.modern-card {
+  border: none;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(11, 45, 114, 0.05);
+  transition: transform 0.3s ease;
+  background-color: #ffffff;
+}
+
+.modern-card:hover {
+  transform: translateY(-5px);
+}
+
+.contact-glass-card {
+  background-color: var(--evella-navy);
+  border-radius: 32px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(11, 45, 114, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.form-input-custom {
+  background-color: var(--evella-glass);
+  border: none;
+  color: white !important;
+  border-radius: 12px;
+}
+
+.form-input-custom::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Select Tag Visibility Fix */
+.form-select-custom {
+  background-color: var(--evella-glass);
+  color: white !important;
+  border: none;
+}
+
+/* Ensures options are readable on all systems */
+.form-select-custom option {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+.btn-evella-primary {
+  background-color: var(--evella-navy);
+  color: #F6E7BC;
+  border-radius: 50px;
+  padding: 12px 35px;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.btn-evella-primary:hover {
+  opacity: 0.9;
+  color: #F6E7BC;
+}
+
+.btn-evella-secondary {
+  background-color: var(--evella-blue);
+  color: white;
+  border-radius: 12px;
+  border: none;
 }
