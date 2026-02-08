@@ -2,14 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --primary: #0B2D72;
-  --secondary: #0992C2;
-  --accent: #0AC4E0;
-  --cream: #F6E7BC;
-}
-
+/* This ensures your custom background works even if the class is slow to load */
 body {
-  color: var(--primary);
-  background: white;
+  background-color: #F6E7BC;
+  margin: 0;
+  font-family: sans-serif;
 }
