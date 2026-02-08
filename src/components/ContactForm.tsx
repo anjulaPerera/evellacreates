@@ -12,13 +12,18 @@ export default function ContactForm() {
     setStatus("SENDING");
 
     const form = e.currentTarget;
-    const data = new FormData(form);
+    const formData = new FormData(form);
+
+    // Converting FormData to a plain object ensures punctuation like "I'm"
+    // is stringified correctly for the JSON request.
+    const entries = Object.fromEntries(formData.entries());
 
     try {
       const response = await fetch("https://formspree.io/f/xwvnkzgo", {
         method: "POST",
-        body: data,
+        body: JSON.stringify(entries),
         headers: {
+          "Content-Type": "application/json",
           Accept: "application/json",
         },
       });
@@ -30,6 +35,7 @@ export default function ContactForm() {
         setStatus("ERROR");
       }
     } catch (error) {
+      console.error("Form submission error:", error);
       setStatus("ERROR");
     }
   };

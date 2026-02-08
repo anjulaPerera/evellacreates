@@ -381,3 +381,56 @@ html {
   background-color: #dc3545;
   color: white;
 }
+
+/* Navbar Link Colors */
+.nav-link-custom {
+  color: var(--evella-navy) !important;
+  transition: color 0.3s ease;
+}
+
+.nav-link-custom:hover {
+  color: var(--evella-blue) !important;
+}
+
+/* Contact Button in Nav */
+.btn-evella-nav {
+  background-color: var(--evella-navy);
+  color: #F6E7BC;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-evella-nav:hover {
+  background-color: var(--evella-blue);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Logo Hover Effect */
+.logo-wrapper {
+  transition: transform 0.3s ease;
+}
+
+.logo-wrapper:hover {
+  transform: scale(1.02);
+}
+
+/* Force the select text to be white and readable */
+.form-select-custom {
+  color: #ffffff !important;
+  background-color: var(--evella-glass) !important;
+}
+
+/* Force the dropdown options to be black/white for system compatibility */
+.form-select-custom option {
+  background-color: #ffffff !important;
+  color: #0B2D72 !important;
+}
+
+/* Fix for the 'punctuation error' visual glitch */
+/* Sometimes fonts with ligatures break on apostrophes in narrow inputs */
+.form-input-custom,
+.form-select-custom {
+  font-variant-ligatures: none;
+  text-rendering: optimizeLegibility;
+}
