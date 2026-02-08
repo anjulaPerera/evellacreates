@@ -1,15 +1,39 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+// Define the shape of our testimonial data
+interface Testimonial {
+  id: number;
+  name: string;
+  role: string;
+  content: string;
+  is_verified: boolean;
+}
 
 export default function Testimonials() {
-  const reviews = [
-    {
-      name: "Sarah J.",
-      role: "Marketing Director",
-      text: "I was struggling to get past the initial screening. After the rewrite, I landed three interviews in one week. The human touch makes a massive difference.",
-      verified: true,
-    },
-    // More will come from the dashboard later
-  ];
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("*")
+        .order("created_at", { ascending: false }); // Show newest first
+
+      if (!error && data) {
+        setTestimonials(data);
+      }
+      setLoading(false);
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  if (loading) return null; // Or a subtle spinner
+  if (testimonials.length === 0) return null; // Hide section if no reviews yet
 
   return (
     <section id="testimonials" className="py-5 bg-light">
@@ -23,27 +47,31 @@ export default function Testimonials() {
           </p>
         </div>
         <div className="row g-4">
-          {reviews.map((rev, i) => (
-            <div key={i} className="col-md-4">
+          {testimonials.map((rev) => (
+            <div key={rev.id} className="col-md-4">
               <div className="card h-100 border-0 shadow-sm p-4">
                 <div className="d-flex align-items-center mb-3">
                   <div
-                    className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                    style={{ width: "40px", height: "40px" }}
+                    className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      backgroundColor: "#0992C2",
+                    }}
                   >
                     {rev.name[0]}
                   </div>
                   <div className="ms-3">
                     <h6 className="mb-0 fw-bold">{rev.name}</h6>
-                    <small className="text-muted">{rev.role}</small>
+                    <small className="text-muted small">{rev.role}</small>
                   </div>
                 </div>
-                <p className="small italic text-muted">
-                  &ldquo;{rev.text}&rdquo;
-                </p>{" "}
-                {rev.verified && (
+                <p className="small fst-italic text-muted">
+                  &ldquo;{rev.content}&rdquo;
+                </p>
+                {rev.is_verified && (
                   <div className="mt-auto pt-3 border-top">
-                    <span className="badge bg-success-subtle text-success small">
+                    <span className="badge bg-success-subtle text-success border border-success-subtle small">
                       ✓ Verified Fiverr Client
                     </span>
                   </div>
