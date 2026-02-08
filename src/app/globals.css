@@ -48,10 +48,10 @@ body {
 }
 
 .form-input-custom {
-  background-color: var(--evella-glass);
-  border: none;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: white !important;
-  border-radius: 12px;
+  transition: all 0.3s ease;
 }
 
 .form-input-custom::placeholder {
@@ -85,13 +85,26 @@ body {
   color: #F6E7BC;
 }
 
+/* Target ONLY the button for its hover effect */
 .btn-evella-secondary {
-  background-color: var(--evella-blue);
-  color: white;
-  border-radius: 12px;
+  background-color: #F6E7BC;
+  color: #0B2D72 !important;
   border: none;
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Ensure this hover DOES NOT affect the text box */
+.btn-evella-secondary:hover {
+  background-color: #f1db9d !important;
+  color: #0B2D72 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-evella-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .tracking-wider {
   letter-spacing: 0.1em;
 }
@@ -180,6 +193,27 @@ html {
 }
 
 .form-input-custom:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 10px rgba(9, 146, 194, 0.2);
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Active/Focus state: Stays dark when you are typing */
+.form-input-custom:focus {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  /* Prevents it turning white */
+  color: white !important;
+  border-color: #0992C2 !important;
+  /* Your brand blue accent */
+  box-shadow: 0 0 15px rgba(9, 146, 194, 0.2) !important;
+  outline: none !important;
+}
+
+/* Important: Prevents browser "autofill" or "value-filled" states from turning white */
+.form-input-custom:-webkit-autofill,
+.form-input-custom:-webkit-autofill:hover,
+.form-input-custom:-webkit-autofill:focus {
+  -webkit-text-fill-color: white !important;
+  -webkit-box-shadow: 0 0 0px 1000px #0B2D72 inset !important;
+  /* Matches your card background */
+  transition: background-color 5000s ease-in-out 0s;
 }

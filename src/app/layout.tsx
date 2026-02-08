@@ -1,15 +1,28 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
+import { Inter } from "next/font/google"; // Import the font loader
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
-// src/app/layout.tsx
+// Configure the Inter font
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata = {
   title: {
     default: "evellacreates | Professional Human-Only Resume Writing",
-    template: "%s | evellacreates"
+    template: "%s | evellacreates",
   },
-  description: "Bypass ATS bots with 100% human-crafted resumes and LinkedIn profiles. Professional career strategy for the 2026 job market.",
-  keywords: ["human resume writer", "ATS optimization 2026", "professional LinkedIn makeover", "career document strategy"],
+  description:
+    "Bypass ATS bots with 100% human-crafted resumes and LinkedIn profiles. Professional career strategy for the 2026 job market.",
+  keywords: [
+    "human resume writer",
+    "ATS optimization 2026",
+    "professional LinkedIn makeover",
+    "career document strategy",
+  ],
   authors: [{ name: "evellacreates" }],
   creator: "evellacreates",
   openGraph: {
@@ -29,7 +42,8 @@ export const metadata = {
   twitter: {
     card: "summary_large_image",
     title: "evellacreates | Human-Only Resumes",
-    description: "Stop letting AI ghostwrite your career. Get a human-crafted strategy.",
+    description:
+      "Stop letting AI ghostwrite your career. Get a human-crafted strategy.",
   },
 };
 
@@ -38,47 +52,40 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  name: "Human-Crafted Resume Writing",
-  serviceType: "Career Services",
-  description:
-    "Manual keyword integration and career storytelling for high-level professionals.",
-  offers: {
-    "@type": "Offer",
-    availability: "https://schema.org/InStock",
-    priceCurrency: "USD",
-    price: "0", // 0 indicates "Contact for Quote"
-  },
-  provider: {
-    "@type": "LocalBusiness",
-    name: "evellacreates",
-    image: "https://www.evellacreates.com/logo.png",
-  },
-};
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Human-Crafted Resume Writing",
+    serviceType: "Career Services",
+    description:
+      "Manual keyword integration and career storytelling for high-level professionals.",
+    offers: {
+      "@type": "Offer",
+      availability: "https://schema.org/InStock",
+      priceCurrency: "USD",
+      price: "0", // 0 indicates "Contact for Quote"
+    },
+    provider: {
+      "@type": "LocalBusiness",
+      name: "evellacreates",
+      image: "https://www.evellacreates.com/logo.png",
+    },
+  };
 
   return (
-    <html lang="en">
+    <html lang="en" className={inter.className}>
+      {/* Apply font class to HTML */}
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
-          rel="stylesheet"
-        />
+        {/* We removed the Google Fonts <link> tags from here */}
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );
