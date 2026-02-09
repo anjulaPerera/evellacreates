@@ -16,7 +16,7 @@ function OrderFormContent() {
   const [formData, setFormData] = useState({
     target_role: "",
     target_region: "",
-    job_links: "", // This was the field causing the issue
+    job_links: "",
     achievements: "",
     new_info: "",
     contact_changes: "",
@@ -27,7 +27,6 @@ function OrderFormContent() {
   const isStandard = pkgKey === "standard";
   const isPremium = pkgKey === "premium";
 
-  // Handle input changes
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -75,23 +74,29 @@ function OrderFormContent() {
           .upload(otherDocsPath, otherDocsFile);
       }
 
-      // 3. Save Order to Database
-      const { error } = await supabase.from("orders").insert([
-        {
-          user_id: userData.user.id,
-          ...formData,
-          resume_url: resumePath,
-          other_docs_url: otherDocsPath,
-          package_name: selectedPackage,
-          linkedin_choice: isPremium
-            ? formData.linkedin_choice
-            : "not_included",
-          status: "awaiting_payment",
-        },
-      ]);
+      // 3. Save Order to Database and get the ID
+      const { data, error } = await supabase
+        .from("orders")
+        .insert([
+          {
+            user_id: userData.user.id,
+            ...formData,
+            resume_url: resumePath,
+            other_docs_url: otherDocsPath,
+            package_name: selectedPackage,
+            linkedin_choice: isPremium
+              ? formData.linkedin_choice
+              : "not_included",
+            status: "awaiting_payment",
+          },
+        ])
+        .select(); // <--- CRITICAL: Get the inserted record back
 
       if (error) throw error;
-      router.push(`/checkout?package=${selectedPackage}`);
+
+      // Redirect with the REAL database ID
+      const orderId = data[0].id;
+      router.push(`/checkout?package=${selectedPackage}&orderId=${orderId}`);
     } catch (err) {
       console.error(err);
       alert("Error saving order. Please try again.");
@@ -107,7 +112,6 @@ function OrderFormContent() {
   return (
     <main className="container py-5 mt-5">
       <div className="row g-4">
-        {/* FORM COLUMN */}
         <div className="col-lg-8">
           <div className="card modern-card p-5 shadow-sm border-0">
             <div className="mb-4">
@@ -168,7 +172,7 @@ function OrderFormContent() {
                   id="job_links"
                   name="job_links"
                   value={formData.job_links}
-                  onChange={handleInputChange} // FIXED: Added this handler
+                  onChange={handleInputChange}
                   type="text"
                   className="form-control"
                   placeholder="LinkedIn or Company job URL"
@@ -322,70 +326,41 @@ function OrderFormContent() {
           </div>
         </div>
 
-        {/* UPSELL / NAVIGATION SIDEBAR */}
         <div className="col-lg-4">
           <div
             className="card border-0 shadow-sm bg-dark text-white p-4 sticky-top"
             style={{ top: "100px" }}
           >
             <h5 className="fw-bold mb-3">Package Management</h5>
-
             {isPremium ? (
               <div>
                 <p className="small opacity-75 mb-4 text-warning">
-                  You are on the Ultimate tier! This covers everything.
+                  You are on the Ultimate tier!
                 </p>
                 <button
                   onClick={() => switchPackage("standard")}
                   className="btn btn-sm btn-outline-light w-100 opacity-50"
                 >
-                  Downgrade to Standard
-                </button>
-              </div>
-            ) : isStandard ? (
-              <div>
-                <p className="small opacity-75">
-                  Recruiters spend 75% more time on profiles that have a
-                  polished LinkedIn.
-                </p>
-                <button
-                  onClick={() => switchPackage("premium")}
-                  className="btn btn-warning w-100 fw-bold mb-3"
-                >
-                  Upgrade to Premium
-                </button>
-                <button
-                  onClick={() => switchPackage("basic")}
-                  className="btn btn-link text-white text-decoration-none small w-100 opacity-50"
-                >
-                  Switch back to Basic
+                  Downgrade
                 </button>
               </div>
             ) : (
               <div>
-                <p className="small opacity-75">
-                  85% of recruiters prioritize candidates with a custom Cover
-                  Letter.
-                </p>
+                <p className="small opacity-75 mb-3">Need more features?</p>
                 <button
-                  onClick={() => switchPackage("standard")}
+                  onClick={() =>
+                    switchPackage(isStandard ? "premium" : "standard")
+                  }
                   className="btn btn-warning w-100 fw-bold mb-3"
                 >
-                  Upgrade to Standard
-                </button>
-                <button
-                  onClick={() => switchPackage("premium")}
-                  className="btn btn-outline-warning w-100 small"
-                >
-                  Go Premium
+                  Upgrade Now
                 </button>
               </div>
             )}
-
             <hr className="my-4 opacity-25" />
             <div className="small opacity-50">
-              <i className="bi bi-info-circle me-1"></i> Your input data is
-              saved automatically when you switch packages.
+              <i className="bi bi-info-circle me-1"></i> Data is saved when
+              switching.
             </div>
           </div>
         </div>
