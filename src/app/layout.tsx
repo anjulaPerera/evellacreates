@@ -83,8 +83,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         <Script
+          type="text/javascript"
           src="https://www.payhere.lk/lib/payhere.js"
-          strategy="lazyOnload"
         />
       </head>
       <body suppressHydrationWarning>

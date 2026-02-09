@@ -1,9 +1,10 @@
 "use client";
 
-import React, { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { Suspense, useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
-// 1. Define strict interfaces to avoid 'any'
+// --- PAYHERE TYPES ---
 interface PayHerePaymentObject {
   sandbox: boolean;
   merchant_id: string;
@@ -31,12 +32,14 @@ interface PayHere {
   onError: (error: string) => void;
 }
 
-// 2. Declare the global payhere constant (provided by the script in layout)
 declare const payhere: PayHere;
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const selectedPackage = searchParams.get("package") || "standard";
+
+  const [userEmail, setUserEmail] = useState<string>("");
 
   // Price configuration aligned with your Pricing.tsx
   const priceMap: Record<string, { label: string; price: string }> = {
@@ -48,77 +51,103 @@ function CheckoutContent() {
   const currentSelection =
     priceMap[selectedPackage.toLowerCase()] || priceMap.standard;
 
+  // Fetch logged in user email from Supabase
+  useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setUserEmail(user.email || "");
+      } else {
+        router.push(`/login?package=${selectedPackage}`);
+      }
+    };
+    fetchUser();
+  }, [router, selectedPackage]);
+
   const startPayment = () => {
+    if (typeof payhere === "undefined") {
+      alert("Payment gateway is still loading. Please wait a moment.");
+      return;
+    }
+
+    // Set this to false when you are ready to accept real payments
+    const isSandbox = true;
+
     const payment: PayHerePaymentObject = {
-      sandbox: true, // Set to false for production
-      merchant_id: "YOUR_MERCHANT_ID", // TODO: Replace with your actual ID
+      sandbox: isSandbox,
+      merchant_id: "1233959", // Your Merchant ID integrated
       return_url: `${window.location.origin}/dashboard?status=success`,
       cancel_url: `${window.location.origin}/checkout?package=${selectedPackage}`,
-      notify_url: "https://your-domain.com/api/payhere-webhook",
-      order_id: `EV-${Math.floor(1000 + Math.random() * 9000)}`,
+      notify_url: "https://evellacreates.com/api/payhere-webhook", // Replace with your actual domain later
+      order_id: `EV-${Date.now()}`, // Unique order ID based on timestamp
       items: currentSelection.label,
       amount: currentSelection.price,
       currency: "USD",
-      hash: "", // Sandbox doesn't require hash
-      first_name: "Client",
-      last_name: "User",
-      email: "client@example.com",
-      phone: "0771234567",
+      hash: "", // Sandbox does not require a hash. In production, you might need to generate one.
+      first_name: "Customer",
+      last_name: userEmail ? userEmail.split("@")[0] : "Client",
+      email: userEmail,
+      phone: "0771234567", // Default placeholder
       address: "Online Service",
       city: "Colombo",
       country: "Sri Lanka",
     };
 
-    if (typeof payhere !== "undefined") {
-      // Callback handlers
-      payhere.onCompleted = (orderId: string) => {
-        console.log("Payment completed. OrderID:" + orderId);
-        window.location.href = `/dashboard?package=${selectedPackage}&payment=success`;
-      };
+    // Callback Handlers
+    payhere.onCompleted = function onCompleted(orderId: string) {
+      console.log("Payment completed. OrderID:" + orderId);
+      // Redirect to dashboard with success state
+      router.push(`/dashboard?package=${selectedPackage}&payment=success`);
+    };
 
-      payhere.onDismissed = () => {
-        console.log("Payment dismissed");
-      };
+    payhere.onDismissed = function onDismissed() {
+      console.log("Payment dismissed by user");
+    };
 
-      payhere.onError = (error: string) => {
-        console.error("PayHere Error: " + error);
-        alert("Payment failed. Please try again.");
-      };
+    payhere.onError = function onError(error: string) {
+      console.error("PayHere Error: " + error);
+      alert("There was an error processing your payment. Please try again.");
+    };
 
-      payhere.startPayment(payment);
-    } else {
-      alert("Payment gateway is loading. Please try again in a second.");
-    }
+    payhere.startPayment(payment);
   };
 
   return (
     <main className="container py-5 mt-5">
-      <div className="card modern-card p-5 text-center shadow-sm border-0">
-        <h2 className="fw-bold mb-4">Finalize Your Investment</h2>
-        <p className="text-muted mb-5">
-          Secure payment for your <strong>{currentSelection.label}</strong>.
-        </p>
+      <div className="row justify-content-center">
+        <div className="col-lg-6">
+          <div className="card modern-card p-5 text-center shadow-sm border-0">
+            <h2 className="fw-bold mb-4">Finalize Your Investment</h2>
+            <p className="text-muted mb-5">
+              Secure payment for your <strong>{currentSelection.label}</strong>.
+            </p>
 
-        <div
-          className="bg-light p-4 rounded-4 mb-5 mx-auto"
-          style={{ maxWidth: "400px" }}
-        >
-          <div className="d-flex justify-content-between mb-2 text-uppercase small opacity-75">
-            <span>Service:</span>
-            <span className="fw-bold">{currentSelection.label}</span>
-          </div>
-          <div className="d-flex justify-content-between h3 fw-bold mb-0">
-            <span>Total:</span>
-            <span>${currentSelection.price}</span>
+            <div className="bg-light p-4 rounded-4 mb-5">
+              <div className="d-flex justify-content-between mb-2 text-uppercase small opacity-75">
+                <span>Selected Service:</span>
+                <span className="fw-bold">{currentSelection.label}</span>
+              </div>
+              <div className="d-flex justify-content-between h3 fw-bold mb-0">
+                <span>Total Amount:</span>
+                <span>${currentSelection.price}</span>
+              </div>
+            </div>
+
+            <button
+              onClick={startPayment}
+              className="btn btn-evella-primary btn-lg w-100 py-3 fw-bold shadow-sm mb-3"
+            >
+              Pay with PayHere
+            </button>
+
+            <p className="small text-muted">
+              <i className="bi bi-shield-lock me-1"></i> Secure encrypted
+              payment via PayHere
+            </p>
           </div>
         </div>
-
-        <button
-          onClick={startPayment}
-          className="btn btn-evella-primary btn-lg w-100 py-3 fw-bold shadow-sm"
-        >
-          Pay with PayHere
-        </button>
       </div>
     </main>
   );
@@ -127,7 +156,11 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense
-      fallback={<div className="p-5 text-center">Preparing Checkout...</div>}
+      fallback={
+        <div className="container py-5 mt-5 text-center">
+          Preparing Checkout...
+        </div>
+      }
     >
       <CheckoutContent />
     </Suspense>

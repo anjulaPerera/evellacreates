@@ -7,7 +7,7 @@ export default function Hero() {
       <div className="py-5">
         <h1 className="display-2 fw-bold mb-4">
           Stop letting <span className="hero-gradient-text">AI ghostwrite</span>
-          your career.
+          &nbsp;your career.
         </h1>
         <p
           className="lead mb-5 mx-auto opacity-75"
