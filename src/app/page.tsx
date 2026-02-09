@@ -26,9 +26,9 @@ export default async function Home() {
       <main>
         <Hero />
         <WhyHuman />
-        <Process />
+        <Testimonials initialData={testimonials || []} /><Process />
         <Pricing />
-        <Testimonials initialData={testimonials || []} />
+        
         <ContactForm />
       </main>
       {/* <Footer /> */}

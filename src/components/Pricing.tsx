@@ -85,11 +85,9 @@ export default function Pricing() {
                 </ul>
                 <button
                   className={`btn btn-lg rounded-pill fw-bold ${pkg.popular ? "btn-evella-primary" : "btn-outline-dark"}`}
-                  onClick={() =>
-                    alert(`Redirecting to ${pkg.name} checkout...`)
-                  }
+                  onClick={() => (window.location.href = "/login")}
                 >
-                  {pkg.buttonText}
+                  Select {pkg.name}
                 </button>
               </div>
             </div>
