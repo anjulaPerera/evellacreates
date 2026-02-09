@@ -81,10 +81,11 @@ function LoginForm() {
 
       <form onSubmit={handleAuth}>
         <div className="mb-3">
-          <label className="small fw-bold text-uppercase opacity-50 mb-1 d-block">
+          <label htmlFor="email" className="small fw-bold text-uppercase opacity-50 mb-1 d-block">
             Email
           </label>
           <input
+            id="email"
             type="email"
             className="form-control"
             value={email}
@@ -94,10 +95,11 @@ function LoginForm() {
           />
         </div>
         <div className="mb-4">
-          <label className="small fw-bold text-uppercase opacity-50 mb-1 d-block">
+          <label htmlFor="password" className="small fw-bold text-uppercase opacity-50 mb-1 d-block">
             Password
           </label>
           <input
+            id="password"
             type="password"
             className="form-control"
             value={password}
