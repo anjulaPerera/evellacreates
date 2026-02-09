@@ -39,12 +39,17 @@ function OrderFormContent() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const resumeFile = (
-      form.querySelector('input[name="resume"]') as HTMLInputElement
-    ).files?.[0];
-    const otherDocsFile = (
-      form.querySelector('input[name="other_docs"]') as HTMLInputElement
-    ).files?.[0];
+
+    // Safely grab the file inputs using optional chaining
+    const resumeInput = form.querySelector(
+      'input[name="resume"]',
+    ) as HTMLInputElement;
+    const otherDocsInput = form.querySelector(
+      'input[name="other_docs"]',
+    ) as HTMLInputElement;
+
+    const resumeFile = resumeInput?.files?.[0];
+    const otherDocsFile = otherDocsInput?.files?.[0];
 
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) {
@@ -64,7 +69,7 @@ function OrderFormContent() {
       const resumePath = `${userData.user.id}/resume-${Date.now()}.${resumeExt}`;
       await supabase.storage.from("resumes").upload(resumePath, resumeFile);
 
-      // 2. Upload Other Docs
+      // 2. Upload Other Docs (if provided)
       let otherDocsPath = "";
       if (otherDocsFile && otherDocsFile.size > 0) {
         const otherExt = otherDocsFile.name.split(".").pop();
@@ -74,7 +79,7 @@ function OrderFormContent() {
           .upload(otherDocsPath, otherDocsFile);
       }
 
-      // 3. Save Order to Database and get the ID
+      // 3. Save Order to Database
       const { data, error } = await supabase
         .from("orders")
         .insert([
@@ -90,11 +95,10 @@ function OrderFormContent() {
             status: "awaiting_payment",
           },
         ])
-        .select(); // <--- CRITICAL: Get the inserted record back
+        .select();
 
       if (error) throw error;
 
-      // Redirect with the REAL database ID
       const orderId = data[0].id;
       router.push(`/checkout?package=${selectedPackage}&orderId=${orderId}`);
     } catch (err) {
@@ -252,23 +256,22 @@ function OrderFormContent() {
                     required
                   />
                 </div>
-                {!isBasic && (
-                  <div className="col-md-6 mb-4">
-                    <label
-                      htmlFor="other_docs"
-                      className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
-                    >
-                      Other Documents (Cover Letter/Ref)
-                    </label>
-                    <input
-                      id="other_docs"
-                      name="other_docs"
-                      type="file"
-                      className="form-control"
-                      accept=".pdf,.doc,.docx"
-                    />
-                  </div>
-                )}
+                {/* Removed conditional rendering - shows for all packages */}
+                <div className="col-md-6 mb-4">
+                  <label
+                    htmlFor="other_docs"
+                    className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                  >
+                    Other Documents (Cover Letter/Ref)
+                  </label>
+                  <input
+                    id="other_docs"
+                    name="other_docs"
+                    type="file"
+                    className="form-control"
+                    accept=".pdf,.doc,.docx"
+                  />
+                </div>
               </div>
 
               {isPremium && (
