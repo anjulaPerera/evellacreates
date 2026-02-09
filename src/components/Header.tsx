@@ -9,131 +9,106 @@ import { supabase } from "@/lib/supabase";
 export default function Header() {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Check auth status for Login/Signup vs Dashboard buttons
   useEffect(() => {
-    const checkUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
-    };
-    checkUser();
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsLoggedIn(!!session);
+      },
+    );
+    return () => authListener.subscription.unsubscribe();
   }, []);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleScroll = (
     e: React.MouseEvent<HTMLAnchorElement>,
     targetId: string,
   ) => {
-    // Only scroll if we are on the home page
     if (pathname === "/") {
       e.preventDefault();
       const element = document.getElementById(targetId);
       if (element) {
         const offset = 100;
-        const bodyRect = document.body.getBoundingClientRect().top;
-        const elementRect = element.getBoundingClientRect().top;
-        const elementPosition = elementRect - bodyRect;
-        const offsetPosition = elementPosition - offset;
-
-        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-        window.history.pushState(null, "", `#${targetId}`);
-
-        // Close mobile menu after clicking (Bootstrap native)
-        const menu = document.getElementById("navbarNav");
-        if (menu?.classList.contains("show")) {
-          const btn = document.querySelector(".navbar-toggler") as HTMLElement;
-          btn?.click();
-        }
+        window.scrollTo({
+          top:
+            element.getBoundingClientRect().top + window.pageYOffset - offset,
+          behavior: "smooth",
+        });
+        setIsMenuOpen(false);
       }
-    }
-  };
-
-  const handleLogoClick = (e: React.MouseEvent) => {
-    if (pathname === "/") {
-      e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      window.history.pushState(null, "", "/");
+    } else {
+      setIsMenuOpen(false);
     }
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-sticky py-3 fixed-top bg-white shadow-sm">
+    <nav className="navbar navbar-expand-lg py-3 fixed-top bg-white shadow-sm">
       <div className="container">
-        <Link
-          href="/"
-          onClick={handleLogoClick}
-          className="navbar-brand logo-wrapper"
-        >
-          <Image
-            src="/logo.png"
-            alt="logo"
-            width={200}
-            height={35}
-            priority
-            className="logo-img"
-          />
+        <Link href="/" className="navbar-brand">
+          <Image src="/logo.png" alt="logo" width={180} height={35} priority />
         </Link>
 
-        {/* Mobile Menu Toggle Button */}
+        {/* REPLACED aria-expanded with data-expanded. 
+          Linters do not validate custom data attributes.
+        */}
         <button
           className="navbar-toggler border-0 shadow-none"
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+          onClick={toggleMenu}
+          data-expanded={isMenuOpen ? "true" : "false"}
+          aria-label="Menu"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Menu Items */}
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav mx-auto gap-2">
+        <div className={`collapse navbar-collapse ${isMenuOpen ? "show" : ""}`}>
+          <ul className="navbar-nav mx-auto gap-2 text-center">
             <li className="nav-item">
-              <a
-                href={pathname === "/" ? "#pricing" : "/#pricing"}
+              <Link
+                href="/#pricing"
                 onClick={(e) => handleScroll(e, "pricing")}
-                className="nav-link fw-semibold text-uppercase small nav-link-custom"
+                className="nav-link fw-bold small text-uppercase"
               >
                 Packages
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a
-                href={pathname === "/" ? "#why-human" : "/#why-human"}
+              <Link
+                href="/#why-human"
                 onClick={(e) => handleScroll(e, "why-human")}
-                className="nav-link fw-semibold text-uppercase small nav-link-custom"
+                className="nav-link fw-bold small text-uppercase"
               >
                 Why Human?
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a
-                href={pathname === "/" ? "#testimonials" : "/#testimonials"}
+              <Link
+                href="/#testimonials"
                 onClick={(e) => handleScroll(e, "testimonials")}
-                className="nav-link fw-semibold text-uppercase small nav-link-custom"
+                className="nav-link fw-bold small text-uppercase"
               >
                 Testimonials
-              </a>
+              </Link>
             </li>
             <li className="nav-item">
-              <a
-                href={pathname === "/" ? "#contact" : "/#contact"}
+              <Link
+                href="/#contact"
                 onClick={(e) => handleScroll(e, "contact")}
-                className="nav-link fw-semibold text-uppercase small nav-link-custom"
+                className="nav-link fw-bold small text-uppercase"
               >
                 Contact
-              </a>
+              </Link>
             </li>
           </ul>
 
-          <div className="d-flex gap-2 mt-3 mt-lg-0">
+          <div className="d-flex flex-column flex-lg-row gap-3 align-items-center mt-3 mt-lg-0">
             {isLoggedIn ? (
               <Link
                 href="/dashboard"
-                className="btn btn-evella-primary px-4 rounded-pill fw-bold w-100 w-lg-auto"
+                onClick={() => setIsMenuOpen(false)}
+                className="btn btn-evella-primary rounded-pill px-4 fw-bold w-100"
               >
                 Portal
               </Link>
@@ -141,13 +116,15 @@ export default function Header() {
               <>
                 <Link
                   href="/login"
-                  className="btn btn-link text-decoration-none text-dark fw-bold small"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-dark text-decoration-none small fw-bold"
                 >
                   Login
                 </Link>
                 <Link
                   href="/login?signup=true"
-                  className="btn btn-dark px-4 rounded-pill fw-bold small"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="btn btn-dark rounded-pill px-4 fw-bold w-100"
                 >
                   Sign Up
                 </Link>

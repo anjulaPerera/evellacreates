@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -16,18 +17,18 @@ export default function Hero() {
           unique story—without the robotic fluff.
         </p>
         <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
-          <a
-            href="#pricing"
+          <Link
+            href="/#pricing"
             className="btn btn-lg btn-evella-primary fw-bold shadow-sm px-5 py-3 rounded-pill"
           >
-            View Packages
-          </a>
-          <a
-            href="#contact"
+            Explore Packages
+          </Link>
+          <Link
+            href="/#contact"
             className="btn btn-lg btn-outline-dark rounded-pill px-5 py-3"
           >
             Get Custom Quote
-          </a>
+          </Link>
         </div>
       </div>
     </section>
