@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"; // Import the font loader
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+
 // Configure the Inter font
 const inter = Inter({
   subsets: ["latin"],

@@ -2,7 +2,7 @@ import React from "react";
 import Hero from "@/components/Hero";
 import WhyHuman from "@/components/WhyHuman";
 import Process from "@/components/Process"; // New
-import Services from "@/components/Services";
+import Pricing from "@/components/Pricing";
 import ContactForm from "@/components/ContactForm";
 import Testimonials from "@/components/Testimonials";
 import { supabase } from "@/lib/supabase";
@@ -27,7 +27,7 @@ export default async function Home() {
         <Hero />
         <WhyHuman />
         <Process />
-        <Services />
+        <Pricing />
         <Testimonials initialData={testimonials || []} />
         <ContactForm />
       </main>
