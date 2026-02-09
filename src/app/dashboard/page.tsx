@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { User } from "@supabase/supabase-js"; // Import the official type
+import Link from "next/link";
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null); // Specific type instead of any
@@ -55,8 +56,9 @@ export default function Dashboard() {
             Since you&apos;ve logged in, we can now link your career details to
             your account.
           </p>
-          {/* We will update this button in Step #3 */}
-          <button className="btn btn-evella-primary">Start Order Form</button>
+          <Link href="/order" className="btn btn-evella-primary">
+            Start Order Form
+          </Link>
         </div>
 
         <button

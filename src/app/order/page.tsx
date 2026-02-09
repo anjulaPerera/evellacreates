@@ -1,43 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-// Define the Order Data type to avoid 'any'
+// Define the Order Data type strictly
 interface OrderPayload {
   user_id: string;
   target_role: string;
   job_links: string;
   achievements: string;
-  education: string;
   linkedin_choice: string;
-  region: string;
   phone_number: string;
   resume_url: string;
   status: "awaiting_payment" | "pending" | "completed";
 }
 
-export default function OrderForm() {
+function OrderFormContent() {
   const [uploading, setUploading] = useState<boolean>(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const selectedPackage = searchParams.get("package") || "standard";
+  const isBasic = selectedPackage.toLowerCase() === "basic";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-
     const file = formData.get("resume") as File;
+
     const { data: userData } = await supabase.auth.getUser();
 
     if (!userData.user) {
       alert("Please log in first");
+      router.push(`/login?package=${selectedPackage}`);
       return;
     }
 
     setUploading(true);
 
     try {
-      // 1. Upload File to Supabase Storage
       const fileExt = file.name.split(".").pop();
       const fileName = `${userData.user.id}-${Date.now()}.${fileExt}`;
       const { data: fileData, error: uploadError } = await supabase.storage
@@ -46,16 +48,15 @@ export default function OrderForm() {
 
       if (uploadError) throw uploadError;
 
-      // 2. Save Order Details to Table
       const orderData: OrderPayload = {
         user_id: userData.user.id,
-        target_role: formData.get("target_role") as string,
-        job_links: formData.get("job_links") as string,
-        achievements: formData.get("achievements") as string,
-        education: formData.get("education") as string,
-        linkedin_choice: formData.get("linkedin_choice") as string,
-        region: formData.get("region") as string,
-        phone_number: formData.get("phone_number") as string,
+        target_role: (formData.get("target_role") as string) || "",
+        job_links: (formData.get("job_links") as string) || "",
+        achievements: (formData.get("achievements") as string) || "",
+        linkedin_choice: isBasic
+          ? "none"
+          : (formData.get("linkedin_choice") as string) || "document",
+        phone_number: (formData.get("phone_number") as string) || "",
         resume_url: fileData.path,
         status: "awaiting_payment",
       };
@@ -66,10 +67,14 @@ export default function OrderForm() {
 
       if (orderError) throw orderError;
 
-      router.push("/checkout");
-    } catch (error) {
-      console.error("Order error:", error);
-      alert("An error occurred while processing your order.");
+      router.push(`/checkout?package=${selectedPackage}`);
+    } catch (err) {
+      // Replacement for 'any': Handle as a generic Error or Supabase error
+      const error = err as Error;
+      console.error("Order error:", error.message);
+      alert(
+        `Error: ${error.message || "An error occurred while processing your order."}`,
+      );
     } finally {
       setUploading(false);
     }
@@ -78,28 +83,27 @@ export default function OrderForm() {
   return (
     <main className="container py-5 mt-5">
       <div className="card modern-card p-5 shadow-sm border-0">
-        <h2 className="fw-bold mb-2">Complete Your Professional Profile</h2>
-        <p className="text-muted mb-4">
-          Tell me what you need, and let&apos;s get you hired. Provide your
-          &ldquo;Dream&rdquo; job links to begin.
-        </p>
+        <div className="mb-4 text-center">
+          <span className="badge bg-primary-subtle text-primary mb-2 text-uppercase fw-bold">
+            {selectedPackage} Package
+          </span>
+          <h2 className="fw-bold mb-2">Complete Your Profile</h2>
+        </div>
 
-        <form onSubmit={handleSubmit} aria-label="Order Details Form">
+        <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-md-6 mb-4">
               <label
                 htmlFor="target_role"
                 className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
               >
-                Target Job Role
+                Target Role
               </label>
               <input
                 id="target_role"
                 name="target_role"
                 type="text"
                 className="form-control"
-                placeholder="e.g. Project Manager"
-                title="Enter your target job role"
                 required
               />
             </div>
@@ -108,15 +112,13 @@ export default function OrderForm() {
                 htmlFor="phone_number"
                 className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
               >
-                Contact Phone Number
+                Phone
               </label>
               <input
                 id="phone_number"
                 name="phone_number"
                 type="tel"
                 className="form-control"
-                placeholder="+1 234 567 890"
-                title="Enter your phone number"
                 required
               />
             </div>
@@ -127,15 +129,13 @@ export default function OrderForm() {
               htmlFor="job_links"
               className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
             >
-              The &ldquo;Dream&rdquo; Job Links
+              Job Links
             </label>
             <textarea
               id="job_links"
               name="job_links"
               className="form-control"
               rows={2}
-              placeholder="Provide 1&ndash;2 links to active job postings..."
-              title="Provide links to your target jobs"
               required
             />
           </div>
@@ -145,15 +145,13 @@ export default function OrderForm() {
               htmlFor="achievements"
               className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
             >
-              Key Achievements (&ldquo;Wins&rdquo;)
+              Achievements
             </label>
             <textarea
               id="achievements"
               name="achievements"
               className="form-control"
               rows={3}
-              placeholder='List 3&ndash;5 wins you are proud of (e.g., "Saved the company $20k")'
-              title="List your career achievements"
               required
             />
           </div>
@@ -163,7 +161,7 @@ export default function OrderForm() {
               htmlFor="resume"
               className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
             >
-              Upload Current Resume
+              Upload Resume
             </label>
             <input
               id="resume"
@@ -171,44 +169,51 @@ export default function OrderForm() {
               type="file"
               className="form-control"
               accept=".pdf,.doc,.docx"
-              title="Upload your current resume file"
               required
             />
           </div>
 
-          <div className="mb-4">
-            <label
-              htmlFor="linkedin_choice"
-              className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
-            >
-              LinkedIn Optimization Choice
-            </label>
-            <select
-              id="linkedin_choice"
-              name="linkedin_choice"
-              className="form-select"
-              title="Select your LinkedIn service preference"
-              required
-            >
-              <option value="document">
-                Document with Instructions (Copy/Paste)
-              </option>
-              <option value="login">
-                Log in and Update for me (Requires 2FA)
-              </option>
-              <option value="none">Do not need LinkedIn Optimization</option>
-            </select>
-          </div>
+          {!isBasic && (
+            <div className="mb-4">
+              <label
+                htmlFor="linkedin_choice"
+                className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+              >
+                LinkedIn Choice
+              </label>
+              <select
+                id="linkedin_choice"
+                name="linkedin_choice"
+                className="form-select"
+                required
+              >
+                <option value="document">Document (Copy/Paste)</option>
+                <option value="login">Log in & Update</option>
+              </select>
+            </div>
+          )}
 
           <button
             type="submit"
             className="btn btn-evella-primary w-100 py-3 fw-bold"
             disabled={uploading}
           >
-            {uploading ? "Uploading Details..." : "Continue to Payment"}
+            {uploading ? "Processing..." : "Continue to Payment"}
           </button>
         </form>
       </div>
     </main>
+  );
+}
+
+export default function OrderPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container py-5 mt-5 text-center">Loading form...</div>
+      }
+    >
+      <OrderFormContent />
+    </Suspense>
   );
 }

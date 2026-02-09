@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter } from "next/font/google"; // Import the font loader
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Script from "next/script";
 
 
 // Configure the Inter font
@@ -81,7 +82,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* We removed the Google Fonts <link> tags from here */}
+        <Script
+          src="https://www.payhere.lk/lib/payhere.js"
+          strategy="lazyOnload"
+        />
       </head>
       <body suppressHydrationWarning>
         <Header />
