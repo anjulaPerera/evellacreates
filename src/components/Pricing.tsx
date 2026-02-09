@@ -48,17 +48,13 @@ export default function Pricing() {
 
   const handleSelect = async (pkgName: string) => {
     const pkg = pkgName.toLowerCase();
-
-    // Check if a user is already logged in
     const {
       data: { session },
     } = await supabase.auth.getSession();
 
     if (session) {
-      // If logged in, go straight to dashboard
       router.push(`/dashboard?package=${pkg}`);
     } else {
-      // If NOT logged in, go to login page
       router.push(`/login?package=${pkg}`);
     }
   };
@@ -66,9 +62,9 @@ export default function Pricing() {
   return (
     <section id="pricing" className="container py-5 mt-5">
       <div className="text-center mb-5">
-        <h2 className="display-5 fw-bold mb-3">Simple, Transparent Pricing</h2>
-        <p className="text-muted lead">
-          Choose the plan that fits your career goals
+        <h2 className="display-5 fw-bold">Choose Your Package</h2>
+        <p className="opacity-75">
+          Invest in a career strategy that pays for itself.
         </p>
       </div>
 
@@ -78,26 +74,26 @@ export default function Pricing() {
             <div
               className={`card h-100 modern-card p-4 ${pkg.popular ? "border border-primary border-2 shadow-lg" : ""}`}
             >
+              {pkg.popular && (
+                <span className="badge bg-primary rounded-pill position-absolute top-0 start-50 translate-middle">
+                  MOST POPULAR
+                </span>
+              )}
               <div className="card-body d-flex flex-column">
-                {pkg.popular && (
-                  <span className="badge bg-primary rounded-pill align-self-start mb-3 px-3 py-2">
-                    MOST POPULAR
-                  </span>
-                )}
-                <h3 className="fw-bold mb-2">{pkg.name}</h3>
-                <div className="mb-3">
+                <h3 className="h4 fw-bold mb-2">{pkg.name}</h3>
+                <div className="d-flex align-items-baseline mb-3">
                   <span className="h2 fw-bold mb-0">${pkg.price}</span>
                   <span className="text-muted ms-1">USD</span>
                 </div>
                 <p className="text-muted small mb-4">{pkg.description}</p>
                 <ul className="list-unstyled mb-5 flex-grow-1">
-                  {pkg.features.map((feature, i) => (
+                  {pkg.features.map((f, i) => (
                     <li
                       key={i}
                       className="mb-3 small d-flex align-items-center"
                     >
                       <i className="bi bi-check2-circle text-primary me-2"></i>
-                      {feature}
+                      {f}
                     </li>
                   ))}
                 </ul>

@@ -1,15 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
-import { User } from "@supabase/supabase-js"; // Import the official type
+import { useRouter, useSearchParams } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 import Link from "next/link";
 
-export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null); // Specific type instead of any
+function DashboardContent() {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
+
+  // 1. Get the package from the URL
+  const searchParams = useSearchParams();
+  const selectedPackage = searchParams.get("package") || "standard";
 
   useEffect(() => {
     const getUser = async () => {
@@ -53,11 +57,17 @@ export default function Dashboard() {
         <div className="bg-light p-4 rounded-4 mb-4">
           <h5 className="fw-bold mb-2">Next Step: Complete Your Order</h5>
           <p className="small text-secondary">
-            Since you&apos;ve logged in, we can now link your career details to
-            your account.
+            You have selected the <strong>{selectedPackage}</strong> package.
+            Click below to finish your profile.
           </p>
-          <Link href="/order" className="btn btn-evella-primary">
-            Start Order Form
+          {/* 2. Pass the package name to the Order page link */}
+          <Link
+            href={`/order?package=${selectedPackage}`}
+            className="btn btn-evella-primary"
+          >
+            Start{" "}
+            {selectedPackage.charAt(0).toUpperCase() + selectedPackage.slice(1)}{" "}
+            Order Form
           </Link>
         </div>
 
@@ -69,5 +79,18 @@ export default function Dashboard() {
         </button>
       </div>
     </div>
+  );
+}
+
+// Wrapped in Suspense because useSearchParams() requires it in Next.js
+export default function Dashboard() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container py-5 mt-5 text-center">Loading...</div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   );
 }

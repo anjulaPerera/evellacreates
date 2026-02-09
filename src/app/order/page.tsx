@@ -13,6 +13,7 @@ interface OrderPayload {
   linkedin_choice: string;
   phone_number: string;
   resume_url: string;
+  package_name: string; // <--- Added this to save to DB
   status: "awaiting_payment" | "pending" | "completed";
 }
 
@@ -21,6 +22,7 @@ function OrderFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Reads from URL: e.g., /order?package=premium
   const selectedPackage = searchParams.get("package") || "standard";
   const isBasic = selectedPackage.toLowerCase() === "basic";
 
@@ -48,6 +50,7 @@ function OrderFormContent() {
 
       if (uploadError) throw uploadError;
 
+      // Prepare data to save to Supabase
       const orderData: OrderPayload = {
         user_id: userData.user.id,
         target_role: (formData.get("target_role") as string) || "",
@@ -58,6 +61,7 @@ function OrderFormContent() {
           : (formData.get("linkedin_choice") as string) || "document",
         phone_number: (formData.get("phone_number") as string) || "",
         resume_url: fileData.path,
+        package_name: selectedPackage, // <--- SAVING THE ACTUAL PACKAGE NAME
         status: "awaiting_payment",
       };
 
@@ -69,12 +73,9 @@ function OrderFormContent() {
 
       router.push(`/checkout?package=${selectedPackage}`);
     } catch (err) {
-      // Replacement for 'any': Handle as a generic Error or Supabase error
       const error = err as Error;
       console.error("Order error:", error.message);
-      alert(
-        `Error: ${error.message || "An error occurred while processing your order."}`,
-      );
+      alert(`Error: ${error.message || "An error occurred."}`);
     } finally {
       setUploading(false);
     }
@@ -84,7 +85,7 @@ function OrderFormContent() {
     <main className="container py-5 mt-5">
       <div className="card modern-card p-5 shadow-sm border-0">
         <div className="mb-4 text-center">
-          <span className="badge bg-primary-subtle text-primary mb-2 text-uppercase fw-bold">
+          <span className="badge bg-primary text-uppercase fw-bold mb-2 px-3 py-2">
             {selectedPackage} Package
           </span>
           <h2 className="fw-bold mb-2">Complete Your Profile</h2>

@@ -19,11 +19,8 @@ function LoginForm() {
   const router = useRouter();
   const selectedPackage = searchParams.get("package") || "standard";
 
-  // REMOVED the top-level 'redirectTo' here to prevent "window is not defined" error
-
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    // window is safe to use here because this function only runs on the client after a click
     const redirectTo = `${window.location.origin}/dashboard?package=${selectedPackage}`;
 
     setLoading(true);
@@ -44,6 +41,7 @@ function LoginForm() {
       if (result.error) throw result.error;
 
       if (!isSignUp) {
+        // Redirect to dashboard with the package preserved
         router.push(`/dashboard?package=${selectedPackage}`);
       } else {
         setMessage({
@@ -60,7 +58,7 @@ function LoginForm() {
   };
 
   const handleGoogleLogin = async () => {
-    // window is safe to use here as well
+    // Correctly tell Supabase where to go after Google login
     const redirectTo = `${window.location.origin}/dashboard?package=${selectedPackage}`;
     await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -73,11 +71,9 @@ function LoginForm() {
       <h2 className="text-center fw-bold mb-4">
         {isSignUp ? "Create Account" : "Welcome Back"}
       </h2>
-
       {message && (
         <div
           className={`alert alert-${message.type === "success" ? "success" : "danger"}`}
-          role="alert"
         >
           {message.text}
         </div>
@@ -85,42 +81,31 @@ function LoginForm() {
 
       <form onSubmit={handleAuth}>
         <div className="mb-3">
-          <label
-            htmlFor="login-email"
-            className="small fw-bold text-uppercase opacity-50 mb-1 d-block"
-          >
+          <label className="small fw-bold text-uppercase opacity-50 mb-1 d-block">
             Email
           </label>
           <input
-            id="login-email"
             type="email"
             className="form-control"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="name@example.com"
-            title="Enter your email"
           />
         </div>
         <div className="mb-4">
-          <label
-            htmlFor="login-password"
-            className="small fw-bold text-uppercase opacity-50 mb-1 d-block"
-          >
+          <label className="small fw-bold text-uppercase opacity-50 mb-1 d-block">
             Password
           </label>
           <input
-            id="login-password"
             type="password"
             className="form-control"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             placeholder="••••••••"
-            title="Enter your password"
           />
         </div>
-
         <button
           type="submit"
           className="btn btn-evella-primary w-100 fw-bold py-3 mb-3"
