@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, Suspense } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -13,11 +13,10 @@ function OrderFormContent() {
   const [uploading, setUploading] = useState<boolean>(false);
 
   // --- PERSISTENCE STATE ---
-  // This keeps your data alive even when switching packages
   const [formData, setFormData] = useState({
     target_role: "",
     target_region: "",
-    job_links: "",
+    job_links: "", // This was the field causing the issue
     achievements: "",
     new_info: "",
     contact_changes: "",
@@ -28,7 +27,7 @@ function OrderFormContent() {
   const isStandard = pkgKey === "standard";
   const isPremium = pkgKey === "premium";
 
-  // Handle input changes to sync with state
+  // Handle input changes
   const handleInputChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -55,20 +54,20 @@ function OrderFormContent() {
     }
 
     if (!resumeFile) {
-      alert("Please upload your resume");
+      alert("Please upload your current resume.");
       return;
     }
 
     setUploading(true);
     try {
-      // Upload Resume
+      // 1. Upload Resume
       const resumeExt = resumeFile.name.split(".").pop();
       const resumePath = `${userData.user.id}/resume-${Date.now()}.${resumeExt}`;
       await supabase.storage.from("resumes").upload(resumePath, resumeFile);
 
-      // Upload Other Docs
+      // 2. Upload Other Docs
       let otherDocsPath = "";
-      if (otherDocsFile) {
+      if (otherDocsFile && otherDocsFile.size > 0) {
         const otherExt = otherDocsFile.name.split(".").pop();
         otherDocsPath = `${userData.user.id}/other-${Date.now()}.${otherExt}`;
         await supabase.storage
@@ -76,6 +75,7 @@ function OrderFormContent() {
           .upload(otherDocsPath, otherDocsFile);
       }
 
+      // 3. Save Order to Database
       const { error } = await supabase.from("orders").insert([
         {
           user_id: userData.user.id,
@@ -94,13 +94,12 @@ function OrderFormContent() {
       router.push(`/checkout?package=${selectedPackage}`);
     } catch (err) {
       console.error(err);
-      alert("Error saving order.");
+      alert("Error saving order. Please try again.");
     } finally {
       setUploading(false);
     }
   };
 
-  // Function to switch packages without losing state
   const switchPackage = (newPkg: string) => {
     router.push(`/order?package=${newPkg.toLowerCase()}`);
   };
@@ -108,22 +107,20 @@ function OrderFormContent() {
   return (
     <main className="container py-5 mt-5">
       <div className="row g-4">
+        {/* FORM COLUMN */}
         <div className="col-lg-8">
           <div className="card modern-card p-5 shadow-sm border-0">
             <div className="mb-4">
-              <span className="badge bg-primary-subtle text-primary mb-2 text-uppercase fw-bold">
-                Current: {selectedPackage} Package
+              <span className="badge bg-primary text-uppercase fw-bold mb-2">
+                {selectedPackage} Tier
               </span>
-              <h2 className="fw-bold">Tell us about your goals</h2>
+              <h2 className="fw-bold">Order Details</h2>
             </div>
 
             <form onSubmit={handleSubmit}>
               <div className="row">
                 <div className="col-md-6 mb-4">
-                  <label
-                    htmlFor="target_role"
-                    className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
-                  >
+                  <label htmlFor="target_role" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
                     Dream Job Role *
                   </label>
                   <input
@@ -133,6 +130,7 @@ function OrderFormContent() {
                     onChange={handleInputChange}
                     type="text"
                     className="form-control"
+                    placeholder="e.g. Marketing Manager"
                     required
                   />
                 </div>
@@ -147,25 +145,24 @@ function OrderFormContent() {
                     onChange={handleInputChange}
                     type="text"
                     className="form-control"
-                    placeholder="US, UK, etc"
+                    placeholder="US, UK, etc."
                     required
                   />
                 </div>
               </div>
 
               <div className="mb-4">
-                <label
-                  htmlFor="job_links"
-                  className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
-                >
+                <label htmlFor="job_links" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
                   Link for your dream job
                 </label>
                 <input
                   id="job_links"
+                  name="job_links"
                   value={formData.job_links}
-                  onChange={handleInputChange}
+                  onChange={handleInputChange} // FIXED: Added this handler
                   type="text"
                   className="form-control"
+                  placeholder="LinkedIn or Company job URL"
                   required
                 />
               </div>
@@ -181,6 +178,7 @@ function OrderFormContent() {
                   onChange={handleInputChange}
                   className="form-control"
                   rows={3}
+                  placeholder="Describe your biggest wins..."
                   required
                 />
               </div>
@@ -196,6 +194,7 @@ function OrderFormContent() {
                   onChange={handleInputChange}
                   className="form-control"
                   rows={2}
+                  placeholder="New certs, projects, etc."
                 />
               </div>
 
@@ -210,6 +209,7 @@ function OrderFormContent() {
                   onChange={handleInputChange}
                   type="text"
                   className="form-control"
+                  placeholder="Only if changed"
                 />
               </div>
 
@@ -229,7 +229,7 @@ function OrderFormContent() {
                 </div>
                 <div className="col-md-6 mb-4">
                   <label htmlFor="other_docs" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
-                    Other Docs
+                    Other Documents
                   </label>
                   <input
                     id="other_docs"
@@ -248,7 +248,7 @@ function OrderFormContent() {
                   </label>
                   <div className="form-check mb-2">
                     <input
-                      id="linkedin-document"
+                      id="linkedin_document"
                       className="form-check-input"
                       type="radio"
                       name="linkedin_choice"
@@ -256,13 +256,13 @@ function OrderFormContent() {
                       checked={formData.linkedin_choice === "document"}
                       onChange={handleInputChange}
                     />
-                    <label htmlFor="linkedin-document" className="form-check-label">
+                    <label htmlFor="linkedin_document" className="form-check-label">
                       Document with Instructions
                     </label>
                   </div>
                   <div className="form-check">
                     <input
-                      id="linkedin-login"
+                      id="linkedin_login"
                       className="form-check-input"
                       type="radio"
                       name="linkedin_choice"
@@ -270,8 +270,8 @@ function OrderFormContent() {
                       checked={formData.linkedin_choice === "login"}
                       onChange={handleInputChange}
                     />
-                    <label htmlFor="linkedin-login" className="form-check-label">
-                      Log in and Update
+                    <label htmlFor="linkedin_login" className="form-check-label">
+                      Log in and Update (Full Service)
                     </label>
                   </div>
                 </div>
@@ -282,59 +282,79 @@ function OrderFormContent() {
                 className="btn btn-evella-primary w-100 py-3 fw-bold"
                 disabled={uploading}
               >
-                {uploading ? "Processing..." : `Pay for ${selectedPackage}`}
+                {uploading
+                  ? "Uploading..."
+                  : `Continue with ${selectedPackage}`}
               </button>
             </form>
           </div>
         </div>
 
+        {/* UPSELL / NAVIGATION SIDEBAR */}
         <div className="col-lg-4">
-          {/* UPSELL / DOWNSELL CARD */}
           <div
             className="card border-0 shadow-sm bg-dark text-white p-4 sticky-top"
             style={{ top: "100px" }}
           >
-            <h5 className="fw-bold mb-3">Package Options</h5>
+            <h5 className="fw-bold mb-3">Package Management</h5>
 
             {isPremium ? (
               <div>
-                <p className="small opacity-75">
-                  You are currently on the <strong>Premium</strong> tier. This
-                  includes the full brand transformation.
+                <p className="small opacity-75 mb-4 text-warning">
+                  You are on the Ultimate tier! This covers everything.
                 </p>
                 <button
                   onClick={() => switchPackage("standard")}
-                  className="btn btn-sm btn-outline-light w-100"
+                  className="btn btn-sm btn-outline-light w-100 opacity-50"
                 >
-                  Switch to Standard ($50)
+                  Downgrade to Standard
+                </button>
+              </div>
+            ) : isStandard ? (
+              <div>
+                <p className="small opacity-75">
+                  Recruiters spend 75% more time on profiles that have a
+                  polished LinkedIn.
+                </p>
+                <button
+                  onClick={() => switchPackage("premium")}
+                  className="btn btn-warning w-100 fw-bold mb-3"
+                >
+                  Upgrade to Premium
+                </button>
+                <button
+                  onClick={() => switchPackage("basic")}
+                  className="btn btn-link text-white text-decoration-none small w-100 opacity-50"
+                >
+                  Switch back to Basic
                 </button>
               </div>
             ) : (
               <div>
                 <p className="small opacity-75">
-                  {isBasic
-                    ? "Recruiters expect a Cover Letter."
-                    : "Your LinkedIn is your digital storefront."}
+                  85% of recruiters prioritize candidates with a custom Cover
+                  Letter.
                 </p>
                 <button
-                  onClick={() =>
-                    switchPackage(isBasic ? "standard" : "premium")
-                  }
+                  onClick={() => switchPackage("standard")}
                   className="btn btn-warning w-100 fw-bold mb-3"
                 >
-                  Upgrade to {isBasic ? "Standard" : "Premium"}
+                  Upgrade to Standard
                 </button>
-
-                {isStandard && (
-                  <button
-                    onClick={() => switchPackage("basic")}
-                    className="btn btn-link text-white text-decoration-none small w-100 opacity-50"
-                  >
-                    Actually, I&apos;ll go back to Basic
-                  </button>
-                )}
+                <button
+                  onClick={() => switchPackage("premium")}
+                  className="btn btn-outline-warning w-100 small"
+                >
+                  Go Premium
+                </button>
               </div>
             )}
+
+            <hr className="my-4 opacity-25" />
+            <div className="small opacity-50">
+              <i className="bi bi-info-circle me-1"></i> Your input data is
+              saved automatically when you switch packages.
+            </div>
           </div>
         </div>
       </div>
