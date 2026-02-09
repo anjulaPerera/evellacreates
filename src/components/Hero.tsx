@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Hero() {
   return (
-    <section className="container text-center py-5">
+    <section className="container text-center py-5 mt-5">
       <div className="py-5">
         <h1 className="display-2 fw-bold mb-4">
           Stop letting <span className="hero-gradient-text">AI ghostwrite</span>{" "}
@@ -15,18 +15,18 @@ export default function Hero() {
           I craft high-impact resumes and LinkedIn profiles that tell your
           unique story—without the robotic fluff.
         </p>
-        <div className="d-flex justify-content-center gap-3">
+        <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
           <a
-            href="#contact"
-            className="btn btn-lg btn-evella-primary fw-bold shadow-sm"
+            href="#pricing"
+            className="btn btn-lg btn-evella-primary fw-bold shadow-sm px-5 py-3 rounded-pill"
           >
-            Get My Custom Quote
+            View Packages
           </a>
           <a
-            href="#services"
-            className="btn btn-lg btn-outline-dark rounded-pill px-5"
+            href="#contact"
+            className="btn btn-lg btn-outline-dark rounded-pill px-5 py-3"
           >
-            View Services
+            Get Custom Quote
           </a>
         </div>
       </div>

@@ -1,3 +1,0 @@
-- [x] Add htmlFor and ids to src/app/order/page.tsx
-- [x] Add htmlFor and ids to src/app/login/page.tsx
-- [x] Add htmlFor to labels in src/app/admin/dashboard/page.tsx
