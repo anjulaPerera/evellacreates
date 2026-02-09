@@ -6,7 +6,7 @@ export default function Hero() {
     <section className="container text-center py-5 mt-5">
       <div className="py-5">
         <h1 className="display-2 fw-bold mb-4">
-          Stop letting <span className="hero-gradient-text">AI ghostwrite</span>{" "}
+          Stop letting <span className="hero-gradient-text">AI ghostwrite</span>
           your career.
         </h1>
         <p

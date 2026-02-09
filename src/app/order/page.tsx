@@ -120,7 +120,10 @@ function OrderFormContent() {
             <form onSubmit={handleSubmit}>
               <div className="row">
                 <div className="col-md-6 mb-4">
-                  <label htmlFor="target_role" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
+                  <label
+                    htmlFor="target_role"
+                    className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                  >
                     Dream Job Role *
                   </label>
                   <input
@@ -135,7 +138,10 @@ function OrderFormContent() {
                   />
                 </div>
                 <div className="col-md-6 mb-4">
-                  <label htmlFor="target_region" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
+                  <label
+                    htmlFor="target_region"
+                    className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                  >
                     Targeting Region
                   </label>
                   <input
@@ -152,7 +158,10 @@ function OrderFormContent() {
               </div>
 
               <div className="mb-4">
-                <label htmlFor="job_links" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
+                <label
+                  htmlFor="job_links"
+                  className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                >
                   Link for your dream job
                 </label>
                 <input
@@ -168,7 +177,10 @@ function OrderFormContent() {
               </div>
 
               <div className="mb-4">
-                <label htmlFor="achievements" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
+                <label
+                  htmlFor="achievements"
+                  className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                >
                   Key Achievements
                 </label>
                 <textarea
@@ -184,7 +196,10 @@ function OrderFormContent() {
               </div>
 
               <div className="mb-4">
-                <label htmlFor="new_info" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
+                <label
+                  htmlFor="new_info"
+                  className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                >
                   Anything new to be added?
                 </label>
                 <textarea
@@ -199,7 +214,10 @@ function OrderFormContent() {
               </div>
 
               <div className="mb-4">
-                <label htmlFor="contact_changes" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
+                <label
+                  htmlFor="contact_changes"
+                  className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                >
                   Contact Info Changes
                 </label>
                 <input
@@ -215,7 +233,10 @@ function OrderFormContent() {
 
               <div className="row">
                 <div className="col-md-6 mb-4">
-                  <label htmlFor="resume" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
+                  <label
+                    htmlFor="resume"
+                    className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                  >
                     Current Resume *
                   </label>
                   <input
@@ -227,18 +248,23 @@ function OrderFormContent() {
                     required
                   />
                 </div>
-                <div className="col-md-6 mb-4">
-                  <label htmlFor="other_docs" className="small fw-bold text-uppercase opacity-50 mb-2 d-block">
-                    Other Documents
-                  </label>
-                  <input
-                    id="other_docs"
-                    name="other_docs"
-                    type="file"
-                    className="form-control"
-                    accept=".pdf,.doc,.docx"
-                  />
-                </div>
+                {!isBasic && (
+                  <div className="col-md-6 mb-4">
+                    <label
+                      htmlFor="other_docs"
+                      className="small fw-bold text-uppercase opacity-50 mb-2 d-block"
+                    >
+                      Other Documents (Cover Letter/Ref)
+                    </label>
+                    <input
+                      id="other_docs"
+                      name="other_docs"
+                      type="file"
+                      className="form-control"
+                      accept=".pdf,.doc,.docx"
+                    />
+                  </div>
+                )}
               </div>
 
               {isPremium && (
@@ -256,7 +282,10 @@ function OrderFormContent() {
                       checked={formData.linkedin_choice === "document"}
                       onChange={handleInputChange}
                     />
-                    <label htmlFor="linkedin_document" className="form-check-label">
+                    <label
+                      htmlFor="linkedin_document"
+                      className="form-check-label"
+                    >
                       Document with Instructions
                     </label>
                   </div>
@@ -270,7 +299,10 @@ function OrderFormContent() {
                       checked={formData.linkedin_choice === "login"}
                       onChange={handleInputChange}
                     />
-                    <label htmlFor="linkedin_login" className="form-check-label">
+                    <label
+                      htmlFor="linkedin_login"
+                      className="form-check-label"
+                    >
                       Log in and Update (Full Service)
                     </label>
                   </div>
