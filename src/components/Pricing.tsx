@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 const packages = [
   {
@@ -13,7 +15,6 @@ const packages = [
       "ATS Score Sheet",
       "48-Hour Delivery",
     ],
-    buttonText: "Order Resume",
     popular: false,
   },
   {
@@ -26,7 +27,6 @@ const packages = [
       "ATS Score Sheet",
       "48-Hour Delivery",
     ],
-    buttonText: "Order Standard",
     popular: true,
   },
   {
@@ -39,18 +39,36 @@ const packages = [
       "ATS Score Sheet",
       "3-Day Priority Delivery",
     ],
-    buttonText: "Order Premium",
     popular: false,
   },
 ];
 
 export default function Pricing() {
+  const router = useRouter();
+
+  const handleSelect = async (pkgName: string) => {
+    const pkg = pkgName.toLowerCase();
+
+    // Check if a user is already logged in
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (session) {
+      // If logged in, go straight to dashboard
+      router.push(`/dashboard?package=${pkg}`);
+    } else {
+      // If NOT logged in, go to login page
+      router.push(`/login?package=${pkg}`);
+    }
+  };
+
   return (
     <section id="pricing" className="container py-5 mt-5">
       <div className="text-center mb-5">
-        <h2 className="display-5 fw-bold">Choose Your Package</h2>
-        <p className="opacity-75">
-          Invest in a career strategy that pays for itself.
+        <h2 className="display-5 fw-bold mb-3">Simple, Transparent Pricing</h2>
+        <p className="text-muted lead">
+          Choose the plan that fits your career goals
         </p>
       </div>
 
@@ -60,14 +78,14 @@ export default function Pricing() {
             <div
               className={`card h-100 modern-card p-4 ${pkg.popular ? "border border-primary border-2 shadow-lg" : ""}`}
             >
-              {pkg.popular && (
-                <span className="badge bg-primary rounded-pill position-absolute top-0 start-50 translate-middle">
-                  MOST POPULAR
-                </span>
-              )}
               <div className="card-body d-flex flex-column">
-                <h3 className="h4 fw-bold mb-2">{pkg.name}</h3>
-                <div className="d-flex align-items-baseline mb-3">
+                {pkg.popular && (
+                  <span className="badge bg-primary rounded-pill align-self-start mb-3 px-3 py-2">
+                    MOST POPULAR
+                  </span>
+                )}
+                <h3 className="fw-bold mb-2">{pkg.name}</h3>
+                <div className="mb-3">
                   <span className="h2 fw-bold mb-0">${pkg.price}</span>
                   <span className="text-muted ms-1">USD</span>
                 </div>
@@ -85,9 +103,7 @@ export default function Pricing() {
                 </ul>
                 <button
                   className={`btn btn-lg rounded-pill fw-bold ${pkg.popular ? "btn-evella-primary" : "btn-outline-dark"}`}
-                  onClick={() =>
-                    (window.location.href = `/login?package=${pkg.name.toLowerCase()}`)
-                  }
+                  onClick={() => handleSelect(pkg.name)}
                 >
                   Select {pkg.name}
                 </button>
@@ -95,18 +111,6 @@ export default function Pricing() {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="text-center mt-5">
-        <p className="text-muted small">
-          Need a custom bundle?{" "}
-          <a
-            href="#contact"
-            className="text-decoration-none fw-bold text-primary"
-          >
-            Request a Custom Quote
-          </a>
-        </p>
       </div>
     </section>
   );
