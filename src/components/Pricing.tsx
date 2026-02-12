@@ -83,7 +83,7 @@ export default function Pricing() {
                 <h3 className="h4 fw-bold mb-2">{pkg.name}</h3>
                 <div className="d-flex align-items-baseline mb-3">
                   <span className="h2 fw-bold mb-0">${pkg.price}</span>
-                  <span className="text-muted ms-1">USD</span>
+                  <span className="text-muted ms-1">LKR</span>
                 </div>
                 <p className="text-muted small mb-4">{pkg.description}</p>
                 <ul className="list-unstyled mb-5 flex-grow-1">

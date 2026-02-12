@@ -64,7 +64,7 @@ export default function RootLayout({
     offers: {
       "@type": "Offer",
       availability: "https://schema.org/InStock",
-      priceCurrency: "USD",
+      priceCurrency: "LKR",
       price: "0", // 0 indicates "Contact for Quote"
     },
     provider: {
